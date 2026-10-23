@@ -52,8 +52,8 @@ func setupDashboardAuthMiddlewareTest(t *testing.T) {
 func issueExpiredDashboardAccessToken(t *testing.T, identity service.AuthIdentity) string {
 	t.Helper()
 	claims := jwt.MapClaims{
-		"iss":       "new-api",
-		"aud":       []string{"new-api-dashboard"},
+		"iss":       "77api",
+		"aud":       []string{"77api-dashboard"},
 		"sub":       fmt.Sprintf("%d", identity.UserID),
 		"token_use": "access",
 		"sid":       identity.SessionID,
@@ -64,7 +64,7 @@ func issueExpiredDashboardAccessToken(t *testing.T, identity service.AuthIdentit
 		"iat":       time.Now().Add(-2 * time.Minute).Unix(),
 	}
 	mac := hmac.New(sha256.New, []byte(common.SessionSecret))
-	_, err := mac.Write([]byte("new-api/auth/access/v1"))
+	_, err := mac.Write([]byte("77api/auth/access/v1"))
 	require.NoError(t, err)
 	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString(mac.Sum(nil))
 	require.NoError(t, err)
