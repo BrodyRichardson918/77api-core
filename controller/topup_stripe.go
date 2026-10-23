@@ -106,7 +106,7 @@ func (*StripeAdaptor) RequestPay(c *gin.Context, req *StripePayRequest) {
 		return
 	}
 
-	reference := fmt.Sprintf("new-api-ref-%d-%d-%s", user.Id, time.Now().UnixMilli(), randstr.String(4))
+	reference := stripeReference(user.Id)
 	referenceId := "ref_" + common.Sha1([]byte(reference))
 
 	payLink, err := genStripeLink(referenceId, user.StripeCustomer, user.Email, req.Amount, req.SuccessURL, req.CancelURL)
@@ -448,4 +448,11 @@ func getStripeMinTopup() int64 {
 		minTopup = minTopup * int(common.QuotaPerUnit)
 	}
 	return int64(minTopup)
+}
+
+// stripeReference builds the merchant-side reference for a top-up order:
+// <prefix><uid>-<unix ms>-<4 random chars>. Only its SHA-1 ever leaves the
+// process (as the "ref_..." trade number), so the prefix is not parsed anywhere.
+func stripeReference(userId int) string {
+	return fmt.Sprintf("77api-ref-%d-%d-%s", userId, time.Now().UnixMilli(), randstr.String(4))
 }
