@@ -1,3 +1,7 @@
+> **77API Core** 是 [New API](https://github.com/QuantumNous/new-api) 的修改版本，用于 77API 平台。
+> 协议 AGPL-3.0（见 [LICENSE](LICENSE)、[NOTICE](NOTICE)）；相对上游的全部改动见 [CHANGES-77API.md](CHANGES-77API.md)。
+> This is a modified version of New API, used by the 77API platform, under AGPL-3.0. See CHANGES-77API.md for all changes.
+
 <div align="center">
 
 ![new-api](/web/public/logo.png)
