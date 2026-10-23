@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"github.com/QuantumNous/new-api/common"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
@@ -15,9 +14,10 @@ func CORS() gin.HandlerFunc {
 	return cors.New(config)
 }
 
+// Version no longer sends any version header (77API drops the upstream one).
+// The function is kept so main.go's registration stays unchanged against upstream.
 func Version() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.Header("X-New-Api-Version", common.Version)
 		c.Next()
 	}
 }
