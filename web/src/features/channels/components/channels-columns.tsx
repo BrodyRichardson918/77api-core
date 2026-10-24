@@ -47,6 +47,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 import { toIntlLocale } from '@/i18n/languages'
+import { withBase } from '@/lib/base-path'
 import {
   formatCurrencyFromUSD,
   formatQuotaWithCurrency,
@@ -893,7 +894,9 @@ export function useChannelsColumns(
                             if (!deploymentId) {
                               return
                             }
-                            const targetUrl = `/models/deployments?dFilter=${encodeURIComponent(String(deploymentId))}`
+                            const targetUrl = withBase(
+                              `/models/deployments?dFilter=${encodeURIComponent(String(deploymentId))}`
+                            )
                             window.open(targetUrl, '_blank', 'noopener')
                           }}
                         />

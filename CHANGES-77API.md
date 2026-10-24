@@ -41,6 +41,7 @@
 | `web/src/features/wallet/lib/ui.tsx`、`web/src/components/layout/components/mobile-drawer.tsx` | `/waffo-logo-light.svg`、`/waffo-logo-dark.svg`、`/avatars/01.png` 经 `withBase` | 同上（静态文件） |
 | `web/src/features/auth/components/legal-consent.tsx`、`terms-footer.tsx` | 用户协议、隐私政策的原生 `<a href>` 经 `withBase` | 原生链接（新标签页打开）不经路由器 |
 | `web/src/features/playground/components/message/message-error.tsx`、`web/src/features/channels/components/dialogs/channel-test-dialog.tsx` | 新标签页打开模型定价设置的 `window.open` 路径经 `withBase` | 同上 |
+| `web/src/features/channels/components/channels-columns.tsx`（回归测试 `web/src/lib/__tests__/root-absolute-urls-77api.test.ts`） | IO.NET 徽标新标签页打开的 `/models/deployments?dFilter=…` 经 `withBase`；新增测试扫描 `web/src`，发现绕过路由器的根绝对 URL（`window.open`、`location.assign/replace/href`、原生 `href=`/`src=` 的字面量，以及同文件里赋了根绝对字面量的变量）未经 `withBase` 即失败（`/api/`、`/console` 除外） | 同上；防止以后再漏 |
 | `web/src/features/wallet/lib/affiliate.ts` | 邀请链接 `${origin}/sign-up?aff=` 改为 `${origin}/admin/sign-up?aff=`（经 `withBase`） | 根路径的 `/sign-up` 已不属于本界面 |
 | `setting/operation_setting/general_setting.go`、`web/src/features/home/components/sections/hero.tsx`、`relay/channel/openai/adaptor.go`（及上面 C7、C10 的测试） | 默认文档链接改为 `https://api.77port.uk/docs`，OpenRouter `HTTP-Referer` 默认值改为 `https://api.77port.uk` | www 不再是 77API 的公开域名 |
 
