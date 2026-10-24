@@ -33,7 +33,7 @@ import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/auth-store'
 
 import { SystemUpdateDialog } from './system-update-dialog'
-import { useSystemUpdate } from './use-system-update'
+import { UPDATE_CHECK_ENABLED, useSystemUpdate } from './use-system-update'
 
 type SystemUpdateActionProps = {
   /** Version labels expand when the header's system-brand container has room. */
@@ -45,7 +45,7 @@ export function SystemUpdateAction(props: SystemUpdateActionProps) {
   const isAdmin = useAuthStore(
     (state) => (state.auth.user?.role ?? 0) >= ROLE.ADMIN
   )
-  if (!isAdmin) return null
+  if (!UPDATE_CHECK_ENABLED || !isAdmin) return null
   return <AdminSystemUpdateAction {...props} />
 }
 

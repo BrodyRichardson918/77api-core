@@ -46,6 +46,10 @@ import {
   type SystemUpdateSnapshot,
 } from './store'
 
+// 77API Core: the upstream release check (api.github.com) is permanently off.
+// It is ANDed into both the query's `enabled` flag and `shouldNotify`, so no
+// request is made and no stale cached release can raise an indicator.
+export const UPDATE_CHECK_ENABLED = false
 export const SYSTEM_UPDATE_INTERVAL = 60 * 60 * 1000
 export const SYSTEM_UPDATE_QUERY_KEY = ['system-update'] as const
 
@@ -139,7 +143,7 @@ export function useSystemUpdate() {
   const queryClient = useQueryClient()
   const query = useQuery({
     ...systemUpdateQueryOptions,
-    enabled: isAdmin && visible && online,
+    enabled: UPDATE_CHECK_ENABLED && isAdmin && visible && online,
   })
 
   useEffect(() => {
@@ -187,7 +191,7 @@ export function useSystemUpdate() {
     comparison,
     hasUpdate,
     isIgnored,
-    shouldNotify: isAdmin && hasUpdate && !isIgnored,
+    shouldNotify: UPDATE_CHECK_ENABLED && isAdmin && hasUpdate && !isIgnored,
     setIgnored,
     checking: query.isFetching,
     online,
