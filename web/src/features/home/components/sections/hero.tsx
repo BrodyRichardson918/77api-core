@@ -49,7 +49,7 @@ export function Hero(props: HeroProps) {
   const { t } = useTranslation()
   const { status } = useStatus()
   const docsUrl =
-    (status?.docs_link as string | undefined) || 'https://www.77port.uk/docs'
+    (status?.docs_link as string | undefined) || 'https://api.77port.uk/docs'
 
   const renderDocsButton = () => {
     const isExternal = docsUrl.startsWith('http')

@@ -26,7 +26,7 @@ import { DEFAULT_LOGO, DEFAULT_SYSTEM_NAME } from '../constants'
 describe('77API brand defaults', () => {
   test('default system name is 77API', () => {
     expect(DEFAULT_SYSTEM_NAME).toBe('77API')
-    expect(DEFAULT_LOGO).toBe('/logo.png')
+    expect(DEFAULT_LOGO).toBe('/admin/logo.png')
   })
 
   test('index.html sets the title and meta title before any JS runs', () => {
@@ -41,7 +41,7 @@ describe('77API brand defaults', () => {
       resolve(__dirname, '../../features/home/components/sections/hero.tsx'),
       'utf8'
     )
-    expect(hero).toContain("'https://www.77port.uk/docs'")
+    expect(hero).toContain("'https://api.77port.uk/docs'")
     expect(hero).not.toContain('docs.newapi.pro')
   })
 })

@@ -34,7 +34,7 @@ func openRouterHeaders(t *testing.T, preset map[string]string) http.Header {
 
 func TestOpenRouterAttribution77api(t *testing.T) {
 	header := openRouterHeaders(t, nil)
-	require.Equal(t, "https://www.77port.uk", header.Get("HTTP-Referer"))
+	require.Equal(t, "https://api.77port.uk", header.Get("HTTP-Referer"))
 	require.Equal(t, "77API", header.Get("X-OpenRouter-Title"))
 }
 

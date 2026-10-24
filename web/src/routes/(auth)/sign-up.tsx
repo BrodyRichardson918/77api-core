@@ -16,19 +16,18 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 
 import { SignUp } from '@/features/auth/sign-up'
-import { useAuthStore } from '@/stores/auth-store'
 
 export const Route = createFileRoute('/(auth)/sign-up')({
   component: SignUp,
-  beforeLoad: async () => {
-    const { auth } = useAuthStore.getState()
-
-    // 如果已经有用户信息，说明已登录，注册页对其无意义，跳转到 dashboard
-    if (auth.user) {
-      throw redirect({ to: '/dashboard' })
-    }
+  beforeLoad: async ({ preload }) => {
+    // 77API: registration lives in the 77API console (same origin, outside
+    // the router basepath), so leave with a full page navigation. Never on a
+    // hover preload: only a real navigation may leave the page.
+    if (preload) return
+    window.location.replace('/console/register')
+    await new Promise<never>(() => {})
   },
 })

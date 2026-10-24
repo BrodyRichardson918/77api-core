@@ -25,6 +25,7 @@ import {
   getFreshAuthHeaders,
   refreshAuthentication,
 } from '@/lib/auth-session'
+import { withBase } from '@/lib/base-path'
 import { handleServerError } from '@/lib/handle-server-error'
 import {
   getServerErrorMessage,
@@ -77,9 +78,9 @@ api.get = ((url: string, config: ApiRequestConfig = {}) => {
 function redirectToSignIn(): void {
   if (
     typeof window !== 'undefined' &&
-    window.location.pathname !== '/sign-in'
+    window.location.pathname !== withBase('/sign-in')
   ) {
-    window.location.replace('/sign-in')
+    window.location.replace(withBase('/sign-in'))
   }
 }
 

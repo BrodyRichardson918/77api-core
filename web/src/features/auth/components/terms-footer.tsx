@@ -18,6 +18,7 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { useTranslation } from 'react-i18next'
 
+import { withBase } from '@/lib/base-path'
 import { cn } from '@/lib/utils'
 
 import type { SystemStatus } from '../types'
@@ -48,11 +49,11 @@ export function TermsFooter({
 
   const agreementLink = {
     label: 'User Agreement',
-    href: '/user-agreement',
+    href: withBase('/user-agreement'),
   }
   const privacyLink = {
     label: 'Privacy Policy',
-    href: '/privacy-policy',
+    href: withBase('/privacy-policy'),
   }
 
   const activeLinks =

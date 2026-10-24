@@ -6,6 +6,8 @@ import { pluginReact } from '@rsbuild/plugin-react'
 import { pluginTailwindcss } from '@rsbuild/plugin-tailwindcss'
 import { tanstackRouter } from '@tanstack/router-plugin/rspack'
 
+import { BASE_PATH } from './src/lib/base-path'
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 export default defineConfig(({ envMode }) => {
@@ -75,6 +77,8 @@ export default defineConfig(({ envMode }) => {
       // Production optimizations
       minify: isProd,
       target: 'web',
+      // 77API: the browser loads this UI from /admin/ (the proxy strips the prefix)
+      assetPrefix: `${BASE_PATH}/`,
       distPath: {
         root: 'dist',
       },

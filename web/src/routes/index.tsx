@@ -16,10 +16,14 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 
 import { Home } from '@/features/home'
 
 export const Route = createFileRoute('/')({
+  // 77API: the marketing home lives at the site root; /admin opens the admin.
+  beforeLoad: () => {
+    throw redirect({ to: '/dashboard', replace: true })
+  },
   component: Home,
 })

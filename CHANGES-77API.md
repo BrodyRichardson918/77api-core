@@ -17,8 +17,31 @@
 | `service/auth_token.go`（及测试 `middleware/auth_test.go`、`service/auth_77api_test.go`） | 访问令牌 issuer `new-api` 改为 `77api`，audience `new-api-dashboard` 改为 `77api-dashboard`，HMAC 域分隔串 `new-api/auth/` 改为 `77api/auth/` | 令牌里不再带上游名字；新部署没有旧令牌，不需要兼容 | C5 |
 | `controller/topup_stripe.go`（及测试 `controller/payment_77api_test.go`） | Stripe 充值的商户引用号前缀 `new-api-ref-` 改为 `77api-ref-`；把内联的 `fmt.Sprintf` 抽成同文件的 `stripeReference(userId)`（格式 `<前缀><uid>-<毫秒>-<4位随机>` 不变）。全仓库检查过：没有任何代码解析或匹配该前缀（对外只出现它的 SHA-1 `ref_...`），无需联动改动 | 支付记录里不再出现上游名字 | C6 |
 | `controller/topup_waffo.go`（及测试 `controller/payment_77api_test.go`） | Waffo 商品信息的应用名回退值 `New API` 改为 `77API`（仅在系统名为空时生效） | 支付页不再显示上游名字 | C6b |
-| `relay/channel/openai/adaptor.go`（及测试 `relay/channel/openai/adaptor_77api_test.go`） | OpenRouter 渠道的归因头：`HTTP-Referer` 默认值 `https://www.newapi.ai` 改为 `https://www.77port.uk`，`X-OpenRouter-Title` 默认值 `New API` 改为 `77API`（渠道自定义头仍优先） | 上游 OpenRouter 看到的是我们的身份 | C7 |
+| `relay/channel/openai/adaptor.go`（及测试 `relay/channel/openai/adaptor_77api_test.go`） | OpenRouter 渠道的归因头：`HTTP-Referer` 默认值 `https://www.newapi.ai` 改为 `https://api.77port.uk`（最初为 `https://www.77port.uk`，单域名后改到 api），`X-OpenRouter-Title` 默认值 `New API` 改为 `77API`（渠道自定义头仍优先） | 上游 OpenRouter 看到的是我们的身份 | C7 |
 | `common/constants.go`、`web/src/lib/constants.ts`、`web/index.html`（及测试 `common/constants_77api_test.go`、`web/src/lib/__tests__/brand-defaults-77api.test.ts`） | 默认系统名 `New API` 改为 `77API`（Go `SystemName`、前端 `DEFAULT_SYSTEM_NAME`），`index.html` 的 `<title>` 与 `<meta name="title">` 同改，JS 加载前页面标题就是 77API | 管理员没设置系统名时，标题和品牌位不显示上游名字 | C8 |
-| `setting/operation_setting/general_setting.go`、`web/src/features/home/components/sections/hero.tsx`（及测试 `setting/operation_setting/general_setting_77api_test.go`、`brand-defaults-77api.test.ts`） | 默认文档链接 `https://docs.newapi.pro` 改为 `https://www.77port.uk/docs`（后端 `DocsLink` 默认值与首页回退链接） | 首页「文档」按钮默认指向我们的文档 | C10 |
+| `setting/operation_setting/general_setting.go`、`web/src/features/home/components/sections/hero.tsx`（及测试 `setting/operation_setting/general_setting_77api_test.go`、`brand-defaults-77api.test.ts`） | 默认文档链接 `https://docs.newapi.pro` 改为 `https://api.77port.uk/docs`（最初为 `https://www.77port.uk/docs`，单域名后改到 api）（后端 `DocsLink` 默认值与首页回退链接） | 首页「文档」按钮默认指向我们的文档 | C10 |
 | `web/public/favicon.ico`、`web/public/logo.png` | 替换为 77API 标志：`favicon.ico` 内含 16/32/48 三个 PNG，`logo.png` 为 512×512 透明底；由 77API 仓库的 `scripts/render-core-icons.mjs` 用 `app/icon.svg` 渲染 | 管理员没设置 Logo 时，页面图标和后台 Logo 是我们的，不是上游的 | C9 |
 | `web/src/features/system-update/use-system-update.ts`、`system-update-action.tsx`（测试改写 `web/src/features/system-update/__tests__/update-checking.test.tsx`） | 新增 `export const UPDATE_CHECK_ENABLED = false`：查询的 `enabled` 与 `shouldNotify` 都与它相与，入口组件在它为 false 时返回 `null`。系统设置里的维护区块（`update-checker-section.tsx`）只通过该入口组件取数，不需要单独改 | 管理后台不再请求 `api.github.com` 检查上游版本，也不会提示升到上游版本 | U1 |
+
+## Served under /admin (single-domain 77API)
+
+77API 只用一个公开域名 `https://api.77port.uk`：站点在 `/`，77API 控制台在 `/console`，本仓库的网关管理界面在 `/admin`。Caddy 把 `/admin/*` 去掉前缀后转给 new-api，所以 Go 端照旧在自己的根路径提供内嵌的 `web/dist`，无需改 Go 路由；但浏览器看到的是 `/admin/...`，前端需按该前缀构建。`/api/*` 仍在根路径，直达 new-api。
+
+| 文件 | 改动 | 原因 |
+|---|---|---|
+| `web/src/lib/base-path.ts`（新增，测试 `web/src/lib/__tests__/base-path-77api.test.ts`） | `BASE_PATH = '/admin'`；`withBase(path)` 给根绝对路径加前缀（已带前缀的、`http(s)://` 等绝对 URL 原样返回） | 唯一的前缀来源；路由器不处理的 URL（静态文件、原生 `<a href>`、`window.open`/`location`）用它，路由目标（`to`、`redirect({ to })`、`<Link to>`）不用，由路由器自己加前缀 |
+| `web/rsbuild.config.ts` | `output.assetPrefix` 设为 `${BASE_PATH}/` | 构建出的 `index.html` 与 JS/CSS/favicon 都从 `/admin/...` 加载 |
+| `web/src/main.tsx` | `createRouter({ basepath: BASE_PATH })` | 路由在 `/admin` 下匹配与生成链接 |
+| `web/src/lib/admin-gate.ts`（新增，测试 `web/src/lib/__tests__/admin-gate-77api.test.ts`）、`web/src/routes/_authenticated/route.tsx` | `adminGateTarget(role)`：角色未知或低于管理员返回 `'/console'`，否则 `null`；受保护路由在确认已登录后，若需离开则 `window.location.replace('/console')` 并挂起本次导航（悬停预加载时不跳转） | 网关界面只给管理员用；`/console` 在 basepath 之外，不能用路由 `redirect` |
+| `web/src/routes/(auth)/sign-up.tsx` | `beforeLoad` 改为 `window.location.replace('/console/register')` 并挂起导航（预加载时不跳转）；`/register` 原本就转到 `/sign-up`，随之一起到控制台 | 注册在 77API 控制台完成 |
+| `web/src/routes/index.tsx` | `/` 重定向到 `/dashboard`（路由内目标，未登录时再由受保护路由送到登录页） | 营销首页在站点根路径，`/admin` 直接进管理界面 |
+| `web/src/features/auth/auth-layout.tsx`、`web/src/components/layout/components/footer.tsx`（测试 `web/src/features/auth/__tests__/auth-layout-attribution-77api.test.tsx`） | 导出页脚里的 `ProjectAttribution`，并在登录/OTP 等认证页底部渲染 | `/` 不再显示首页，首页页脚里的 new-api 署名与上游链接（NOTICE 要求）改在每个访问 `/admin` 的人都会看到的登录页显示 |
+| `web/src/lib/http-client.ts` | 401 后跳登录页改为 `withBase('/sign-in')`（判断是否已在登录页也用它） | 整页跳转不经路由器，需自带前缀 |
+| `web/src/lib/constants.ts`、`web/src/components/layout/components/footer.tsx`（测试期望 `brand-defaults-77api.test.ts`） | 默认 Logo `'/logo.png'` 改为 `withBase('/logo.png')` | `public/` 里的静态文件在 `/admin/` 下 |
+| `web/src/features/wallet/lib/ui.tsx`、`web/src/components/layout/components/mobile-drawer.tsx` | `/waffo-logo-light.svg`、`/waffo-logo-dark.svg`、`/avatars/01.png` 经 `withBase` | 同上（静态文件） |
+| `web/src/features/auth/components/legal-consent.tsx`、`terms-footer.tsx` | 用户协议、隐私政策的原生 `<a href>` 经 `withBase` | 原生链接（新标签页打开）不经路由器 |
+| `web/src/features/playground/components/message/message-error.tsx`、`web/src/features/channels/components/dialogs/channel-test-dialog.tsx` | 新标签页打开模型定价设置的 `window.open` 路径经 `withBase` | 同上 |
+| `web/src/features/wallet/lib/affiliate.ts` | 邀请链接 `${origin}/sign-up?aff=` 改为 `${origin}/admin/sign-up?aff=`（经 `withBase`） | 根路径的 `/sign-up` 已不属于本界面 |
+| `setting/operation_setting/general_setting.go`、`web/src/features/home/components/sections/hero.tsx`、`relay/channel/openai/adaptor.go`（及上面 C7、C10 的测试） | 默认文档链接改为 `https://api.77port.uk/docs`，OpenRouter `HTTP-Referer` 默认值改为 `https://api.77port.uk` | www 不再是 77API 的公开域名 |
+
+未改动（有意保留）：OAuth 回调地址（`web/src/lib/oauth.ts`、`use-oauth-login.ts`、设置页显示的回调 URL，以及 Go 端 `oauth/*.go` 用 `ServerAddress + "/oauth/..."` 做的令牌交换）仍是根路径 `/oauth/...`，前后端必须一起改，目前没有配置任何 OAuth 提供方；`/api/*` 请求不加前缀。

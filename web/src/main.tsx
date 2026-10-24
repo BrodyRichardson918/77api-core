@@ -21,6 +21,7 @@ import { RouterProvider, createRouter } from '@tanstack/react-router'
 import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
 
+import { BASE_PATH } from '@/lib/base-path'
 import { installBuildMetadata } from '@/lib/build-metadata'
 import { applyFaviconToDom } from '@/lib/dom-utils'
 import '@/lib/dayjs'
@@ -50,6 +51,8 @@ const queryClient = createAppQueryClient(() => {
 // Create a new router instance
 const router = createRouter({
   routeTree,
+  // 77API: served under /admin on the single public origin
+  basepath: BASE_PATH,
   context: { queryClient },
   defaultPreload: 'intent',
   defaultPreloadStaleTime: 0,

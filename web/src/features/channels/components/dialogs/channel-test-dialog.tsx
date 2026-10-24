@@ -79,6 +79,7 @@ import {
 } from '@/components/ui/tooltip'
 import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
 import { useIsMobile } from '@/hooks/use-mobile'
+import { withBase } from '@/lib/base-path'
 import { handleServerError } from '@/lib/handle-server-error'
 
 import { updateChannel } from '../../api'
@@ -1256,7 +1257,10 @@ function FailureResultContent({
             size='sm'
             className='h-7 w-fit px-2 text-xs'
             onClick={() =>
-              window.open('/system-settings/billing/model-pricing', '_blank')
+              window.open(
+                withBase('/system-settings/billing/model-pricing'),
+                '_blank'
+              )
             }
           >
             <Settings className='mr-1 h-3 w-3 shrink-0' />
